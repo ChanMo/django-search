@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block css %}
+<style>
+.section {
+  padding: 1rem 1.5rem;
+}
+</style>
+{% endblock %}
+{% block main %}
+<div class="section">
+  <div class="container content">
+    <h1 class="has-text-centered">MDMS</h1>
+    <form>
+      <div class="control has-icons-left">
+        <input class="input is-rounded is-medium" type="search" name="search" value="{{key}}" />
+        <span class="icon is-small is-left">
+          <i data-feather="search" width="20"></i>
+        </span>
+      </div>
+    </form>
+  </div>
+</div>
+<div class="section">
+  <div class="container content">
+    {% for row in results %}
+    {% with object=row.content_object %}
+    {% if row.content_type.app_label == "project" and row.content_type.model == "project" %}
+    <a href="/admin/project/project/{{row.object_id}}/change/" class="box">
+      <div class="level mb-4">
+        <h5 class="level-left mb-0">[项目] {{object}}</h5>
+        <span class="level-right has-text-info is-size-7">{{object.get_status_display}}</span>
+      </div>
+      {% if object.customer %}
+      <p><span class="tag is-warning">{{object.customer}}</span></p>
+      {% endif %}
+      <p class="is-size-7">{{object.description|truncatechars:20}}</p>
+      <p class="is-size-7">来源: {{object.channel|default:""}}</p>
+      <div class="tags">{% for tag in object.tags.names %}<span class="tag">{{tag}}</span>{% endfor %}</div>
+    </a>
+    {% elif row.content_type.app_label == "project" and row.content_type.model == "customer" %}
+    <a href="/admin/project/customer/{{row.object_id}}/change/" class="box">
+      <h5>[客户] {{object.name}}</h5>
+      <p class="is-size-7">累计金额: <span class="has-text-danger">{{object.amount}}</span></p>
+      <div class="tags">{% for tag in object.tags.names %}<span class="tag">{{tag}}</span>{% endfor %}</div>
+    </a>
+    {% elif row.content_type.app_label == "find" and row.content_type.model == "find" %}
+    <a href="/admin/find/find/{{row.object_id}}/change/" class="box">
+      <h5>[新项目] {{object.name}}</h5>
+      <p class="is-size-7">{{object.content|truncatechars:20}}</p>
+      <div class="tags">{% for tag in object.tags.names %}<span class="tag">{{tag}}</span>{% endfor %}</div>
+    </a>
+    {% else %}
+    <a href="{{ row.content_object.get_absolute_url }}" class="box">
+      <p>{{row.content_object}}</p>
+    </a>
+    {% endif %}
+    {% endwith %}
+    {% endfor %}
+  </div>
+</div>
+
+{% if results %}
+<div class="section">
+  <div class="container">
+    <nav class="pagination is-small" role="navigation" aria-label="pagination">
+      <a class="pagination-previous" {% if results.has_previous %}href="?search={{key}}&page={{results.previous_page_number}}"{% else %}disabled{% endif %}>{% translate "Previous" %}</a>
+      <a class="pagination-next" {% if results.has_next %}href="?search={{key}}&page={{results.next_page_number}}"{% else %}disabled{% endif %}>{% translate "Next page" %}</a>
+      <ul class="pagination-list" style="list-style-type:none;">
+        <li><a class="pagination-link is-current" aria-label="Page current" aria-current="page">{{results.number}}</a></li>
+      </ul>
+    </nav>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

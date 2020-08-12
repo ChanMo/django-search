@@ -1,0 +1,58 @@
+{% extends "admin/base_site.html" %}
+{% block extrastyle %}
+<style>
+#content-main form {
+  text-align: center;
+  margin: 1rem 0;
+}
+#content-main input[type="search"] {
+  width: 320px;
+  padding: .7rem 1rem;
+  border-radius: 3rem !important;
+  border: 1px solid grey;
+}
+.item {
+  display: block;
+  margin-bottom: 1rem;
+  padding: .5rem;
+  box-sizing: border-box;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+}
+.item h4 {
+  margin: 0;
+}
+.paginator a:link, .paginator a:visited {
+  text-decoration: none;
+  font-size: 0.8rem;
+  background: #efefef;
+  padding: .25rem .5rem;
+}
+.paginator span {
+  margin: 0 .5rem;
+}
+</style>
+{% endblock %}
+{% block content %}
+<div id="content-main">
+  <div class="module">
+    <form >
+      <input type="search" name="search" value="{{key}}" />
+    </form>
+    {% for row in results %}
+    <a href="/admin/{{row.content_type.app_label}}/{{row.content_type.model}}/{{row.object_id}}/change/" class="item">
+      <h4>{{row.content_object}}</h4>
+      <p>{{row.content_type.app_label}}/{{row.content_type.model}}</p>
+    </a>
+    {% endfor %}
+    <p class="paginator">
+    {% if results.has_previous %}
+    <a href="?search={{key}}&page={{results.previous_page_number}}">上一页</a>
+    {% endif %}
+    <span class="this-page">{{results.number}}</span>
+    {% if results.has_next %}
+    <a href="?search={{key}}&page={{results.next_page_number}}">下一页</a>
+    {% endif %}
+    </p>
+  </div>
+</div>
+{% endblock %}
